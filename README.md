@@ -1,4 +1,4 @@
-# RiPCord
+# RiPCord [![Build Status](https://travis-ci.org/klaustopher/ripcord.svg?branch=master)](https://travis-ci.org/klaustopher/ripcord)
 
 This is a [JSON-RPC 2.0](http://www.jsonrpc.org/specification) implementation. It is heavily based on [JSONRPC::Client](https://github.com/fxposter/jsonrpc-client) but has a lot of changes
 from the initial implementation that are sort of specific to our use case. But it might work for you as well ;)
