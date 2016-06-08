@@ -22,6 +22,7 @@ describe Ripcord::Client do
       expect(subject).to receive(:generate_request_id).and_return('0859f481778bc447c8ea4c0c338fd332')
 
       expect(subject).to receive(:execute_request).with(Ripcord::JsonRPC::Request)
+      expect(subject).to receive(:parse_response)
 
       subject.call('person.create', { name: 'Clark Kent'} )
 
@@ -88,8 +89,7 @@ describe Ripcord::Client do
   end
 
   context '#parse_response' do
-    let(:http_response) { double(code: '200', body: '{"jsonrpc":"2.0","result":50,"id":"671004c7c95e279fec1e1b055ed81723"}')}
-
+    let(:http_response) { double(code: '200', body: '{"jsonrpc":"2.0","result":50,"id":"671004c7c95e279fec1e1b055ed81723"}') }
   end
 
 

@@ -59,9 +59,10 @@ module Ripcord
 
       # try to parse json
       begin
-        JSON.parse(http_response.body, symbolize_names: true)
-        
-        InvalidJSON
+        json_data = JSON.parse(http_response.body, symbolize_names: true)
+      rescue JSON::ParserError
+        raise Ripcord::Error::InvalidJSON.new
+      end
 
       http_response
     end
