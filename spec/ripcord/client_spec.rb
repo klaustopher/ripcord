@@ -89,14 +89,13 @@ describe Ripcord::Client do
   end
 
   context '#parse_response' do
-    let(:http_response) { double(code: '200', body: '{}') }
+    let(:http_response) { double(Net::HTTPSuccess, code: 200, body: '{}') }
 
-    it 'raises an exception when a 4xx error occurs' do
-      skip
-    end
-
-    it 'raises an exception when a 5xx error occurs' do
-      skip
+    it 'raises an exception when a non 2xx status code is received' do
+      allow(http_response).to receive(:code).and_return(401)
+      expect do
+        subject.send(:parse_response, http_response)
+      end.to raise_error(Ripcord::Error::InvalidResponse)
     end
 
     it 'wraps the JSON parse errors in an InvalidJSON expection' do
@@ -113,9 +112,8 @@ describe Ripcord::Client do
     context 'Single Response (Hash)' do
       it 'calls the `create_response_object` method with the parsed JSON' do
         allow(http_response).to receive(:body).and_return('{"jsonrpc":"2.0","result":50,"id":"1"}')
-        allow(subject).to receive(:valid_json_rpc_format?).and_return(true)
 
-        expect(subject).to receive(:create_response_object).with({jsonrpc: '2.0', result: 50, id: '1'})
+        expect(Ripcord::JsonRPC::Response).to receive(:from_data).with({jsonrpc: '2.0', result: 50, id: '1'})
 
         subject.send(:parse_response, http_response)
       end
@@ -124,97 +122,12 @@ describe Ripcord::Client do
     context 'Batch Response (Array)' do
       it 'correctly parses an array response into an array of JsonRPC::Response objects' do
         allow(http_response).to receive(:body).and_return('[{"jsonrpc":"2.0","result":50,"id":"1"}, {"jsonrpc":"2.0","result":20,"id":"2"}]')
-        allow(subject).to receive(:valid_json_rpc_format?).and_return(true)
 
-        expect(subject).to receive(:create_response_object).once.with({jsonrpc: '2.0', result: 50, id: '1'})
-        expect(subject).to receive(:create_response_object).once.with({jsonrpc: '2.0', result: 20, id: '2'})
+        expect(Ripcord::JsonRPC::Response).to receive(:from_data).once.with({jsonrpc: '2.0', result: 50, id: '1'})
+        expect(Ripcord::JsonRPC::Response).to receive(:from_data).once.with({jsonrpc: '2.0', result: 20, id: '2'})
 
         subject.send(:parse_response, http_response)
       end
     end
   end
-
-  context '#valid_json_rpc_format?' do
-    it 'returns false when data is not a hash' do
-      expect(subject.send(:valid_json_rpc_format?, "some other data")).to be_falsey
-    end
-
-    it 'returns false when data has wrong JSONRPC version' do
-      expect(subject.send(:valid_json_rpc_format?, { jsonrpc: '1.0', id: '1', result: 50 })).to be_falsey
-    end
-
-    it 'returns false when data has no id field' do
-      expect(subject.send(:valid_json_rpc_format?, { jsonrpc: '2.0', result: 50 })).to be_falsey
-    end
-
-    it 'returns false when data has error and result' do
-      expect(subject.send(:valid_json_rpc_format?, { jsonrpc: '2.0', id: '1', error: { code: 4711, message: 'some message' }, result: 50 })).to be_falsey
-    end
-
-    it 'returns false when data has neither error nor result' do
-      expect(subject.send(:valid_json_rpc_format?, { jsonrpc: '2.0', id: '1' })).to be_falsey
-    end
-
-    it 'returns false when the error data is not a hash' do
-      expect(subject.send(:valid_json_rpc_format?, { jsonrpc: '2.0', id: '1', error: 'some-error' })).to be_falsey
-    end
-
-    it 'returns false when the error data has no code' do
-      expect(subject.send(:valid_json_rpc_format?, { jsonrpc: '2.0', id: '1', error: { message: 'some message' } })).to be_falsey
-    end
-
-    it 'returns false when the error code is not a number' do
-      expect(subject.send(:valid_json_rpc_format?, { jsonrpc: '2.0', id: '1', error: { code: "4711", message: 'some message' } })).to be_falsey
-    end
-
-    it 'returns false when the error has no message' do
-      expect(subject.send(:valid_json_rpc_format?, { jsonrpc: '2.0', id: '1', error: { code: 4711 } })).to be_falsey
-    end
-
-    it 'returns false when the error message is not a string' do
-      expect(subject.send(:valid_json_rpc_format?, { jsonrpc: '2.0', id: '1', error: { code: 4711, message: { foo: 123, bar: 456} } })).to be_falsey
-    end
-
-    it 'returns true for a valid response' do
-      expect(subject.send(:valid_json_rpc_format?, { jsonrpc: '2.0', id: '1', error: { code: 4711, message: "some message" } })).to be_truthy
-    end
-
-    it 'returns false when an exception occurs' do
-      allow_any_instance_of(Hash).to receive(:has_key?).and_raise('some error')
-      expect(subject.send(:valid_json_rpc_format?, { jsonrpc: '2.0', id: '1', error: { code: 4711, message: "some message" } })).to be_falsey
-    end
-  end
-
-  context '#create_response_object' do
-
-    context 'JSON-RPC Errors' do
-      it 'handles -32700 (Parse Error) and returns a JsonRPC::Error object' do
-
-      end
-
-      it 'handles -32600 (Invalid Request) and returns a JsonRPC::Error object' do
-
-      end
-
-      it 'handles -32601 (Method not found) and returns a JsonRPC::Error object' do
-
-      end
-
-      it 'handles -32602 (Invalid params) and returns a JsonRPC::Error object' do
-
-      end
-
-      it 'handles -32603 (Internal Error) and returns a JsonRPC::Error object' do
-
-      end
-
-      it 'handles all application errors and returns a JsonRPC::Error object' do
-
-      end
-
-    end
-
-  end
-
-
 end

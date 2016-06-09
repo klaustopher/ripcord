@@ -19,8 +19,10 @@ module Ripcord
 
       @http_client = Net::HTTP.new(@endpoint_url.host, @endpoint_url.port)
 
-      # Debug code
-      @http_client.set_debug_output(Logger.new($stdout))
+      if @endpoint_url.kind_of?(URI::HTTPS)
+        @http_client.use_ssl=true
+        #@http_client.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
     end
 
     def call(method, params)
@@ -34,6 +36,10 @@ module Ripcord
     def logger=(logger)
       @logger = logger
       @http_client.set_debug_output(logger)
+    end
+
+    def inspect
+      "#<Ripcord::Client endpoint=#{@endpoint_url.to_s}>"
     end
 
     private
@@ -53,9 +59,11 @@ module Ripcord
     end
 
     def parse_response(http_response)
-      response_code = http_response.code.to_i
-
       # Check status code
+      status_code = http_response.code.to_i
+      if status_code < 200 || status_code > 299
+        raise Ripcord::Error::InvalidResponse.new(http_response.body)
+      end
 
       # try to parse json
       begin
@@ -65,37 +73,12 @@ module Ripcord
       end
 
       if json_data.kind_of?(Hash) # Handle single response
-        raise Ripcord::Error::InvalidResponse.new(json_data.inspect) unless valid_json_rpc_format?(json_data)
-        create_response_object(json_data)
+        Ripcord::JsonRPC::Response.from_data(json_data)
       elsif json_data.kind_of?(Array) # Handle batch response
         json_data.map do |request_json|
-          raise Ripcord::Error::InvalidResponse.new(request_json.inspect) unless valid_json_rpc_format?(request_json)
-          create_response_object(request_json)
+          Ripcord::JsonRPC::Response.from_data(request_json)
         end
       end
-    end
-
-    def valid_json_rpc_format?(json_data)
-      return false if !json_data.kind_of?(Hash)
-      return false if json_data[:jsonrpc] != Ripcord::JSON_RPC_VERSION
-      return false if !json_data.has_key?(:id)
-      return false if !(json_data.has_key?(:error) ^ json_data.has_key?(:result))
-
-      if json_data.has_key?(:error)
-        return false if !json_data[:error].kind_of?(Hash)
-        return false if !json_data[:error].has_key?(:code)
-        return false if !json_data[:error][:code].kind_of?(Fixnum)
-        return false if !json_data[:error].has_key?(:message)
-        return false if !json_data[:error][:message].kind_of?(String)
-      end
-
-      true
-
-    rescue
-      false
-    end
-
-    def create_response_object(json_data)
     end
 
     def generate_request_id
