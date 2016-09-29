@@ -36,7 +36,7 @@ client.authentication = Ripcord::Authentication::HTTPBasicAuth.new('user', 'pass
 
 ```ruby
 # HTTP Token Auth (https://tools.ietf.org/html/draft-hammer-http-token-auth-01)
-client.authentication = Ripcord::Authentication::HTTPBasicAuth.new('some-token')
+client.authentication = Ripcord::Authentication::HTTPTokenAuth.new('some-token')
 ```
 
 ```ruby
