@@ -33,11 +33,11 @@ describe Ripcord::JsonRPC::Response do
     end
 
     it "creates a response object from the hash" do
-      response = Ripcord::JsonRPC::Response.from_data({
-                                                        jsonrpc: "2.0",
-                                                        result: { user_id: 1 },
-                                                        id: "1742e8634a96e9d24a1891927803127c"
-                                                      })
+      response = Ripcord::JsonRPC::Response.from_data(
+        jsonrpc: "2.0",
+        result: { user_id: 1 },
+        id: "1742e8634a96e9d24a1891927803127c"
+      )
 
       expect(response).to be_successful
       expect(response.error).to be_nil
@@ -46,8 +46,14 @@ describe Ripcord::JsonRPC::Response do
     end
 
     it "creates a response object with error object from hash" do
-      response = Ripcord::JsonRPC::Response.from_data({ jsonrpc: "2.0", id: "1",
-                                                        error: { code: -32_700, message: "An error occurred on the server while parsing the JSON text." } })
+      response = Ripcord::JsonRPC::Response.from_data(
+        jsonrpc: "2.0",
+        id: "1",
+        error: {
+          code: -32_700,
+          message: "An error occurred on the server while parsing the JSON text."
+        }
+      )
 
       expect(response).not_to be_successful
       expect(response.result).to be_nil
@@ -112,9 +118,10 @@ describe Ripcord::JsonRPC::Response do
     end
 
     it "returns false when an exception occurs" do
-      allow_any_instance_of(Hash).to receive(:has_key?).and_raise("some error")
-      expect(Ripcord::JsonRPC::Response.valid_data?({ jsonrpc: "2.0", id: "1",
-                                                      error: { code: 4711, message: "some message" } })).to be_falsey
+      data = { jsonrpc: "2.0", id: "1", error: { code: 4711, message: "some message" } }
+
+      allow(data).to receive(:key?).and_raise("some error")
+      expect(Ripcord::JsonRPC::Response.valid_data?(data)).to be_falsey
     end
   end
 end
