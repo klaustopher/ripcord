@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require "bundler/setup"
 require "ripcord"
@@ -11,4 +12,4 @@ require "ripcord"
 # Pry.start
 
 require "irb"
-IRB.start
+IRB.start(__FILE__)

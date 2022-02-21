@@ -1,10 +1,15 @@
-require 'ripcord/json_rpc/request'
+# frozen_string_literal: true
 
-module Ripcord::JsonRPC
-  class Notification < Request
-    def initialize(method, params)
-      @method, @params = method, params
-      @id = nil
+require "ripcord/json_rpc/request"
+
+module Ripcord
+  module JsonRPC
+    class Notification < Request
+      def initialize(method, params)
+        @method = method
+        @params = params
+        @id = nil
+      end
     end
   end
 end

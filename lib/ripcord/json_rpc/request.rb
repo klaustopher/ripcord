@@ -1,25 +1,32 @@
-module Ripcord::JsonRPC
-  class Request
-    attr_accessor :method, :params
-    attr_reader :id
+# frozen_string_literal: true
 
-    def initialize(method, params, id)
-      @method, @params, @id = method, params, id
-    end
+module Ripcord
+  module JsonRPC
+    class Request
+      attr_accessor :method, :params
+      attr_reader :id
 
-    def to_payload
-      {
-        jsonrpc: Ripcord::JSON_RPC_VERSION,
-        method: method,
-      }.tap do |payload_hash|
-        payload_hash[:params] = params if should_include_params?
-        payload_hash[:id] = id unless id.nil?
+      def initialize(method, params, id)
+        @method = method
+        @params = params
+        @id = id
       end
-    end
 
-    private
-    def should_include_params?
-      (params.kind_of?(Array) || params.kind_of?(Hash)) && !params.empty?
+      def to_payload
+        {
+          jsonrpc: Ripcord::JSON_RPC_VERSION,
+          method: method
+        }.tap do |payload_hash|
+          payload_hash[:params] = params if should_include_params?
+          payload_hash[:id] = id unless id.nil?
+        end
+      end
+
+      private
+
+      def should_include_params?
+        (params.is_a?(Array) || params.is_a?(Hash)) && !params.empty?
+      end
     end
   end
 end

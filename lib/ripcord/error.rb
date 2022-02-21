@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Ripcord
   module Error
     class InvalidResponse < StandardError
       def initialize(response_body = nil)
-        message =  'Invalid or empty response from server.'
+        message =  "Invalid or empty response from server."
         message += "\nResponse: #{response_body}" if response_body
 
         super(message)

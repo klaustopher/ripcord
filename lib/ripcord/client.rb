@@ -1,11 +1,13 @@
-require 'ripcord/authentication'
-require 'ripcord/json_rpc'
+# frozen_string_literal: true
 
-require 'securerandom'
-require 'uri'
-require 'net/http'
-require 'json'
-require 'logger'
+require "ripcord/authentication"
+require "ripcord/json_rpc"
+
+require "securerandom"
+require "uri"
+require "net/http"
+require "json"
+require "logger"
 
 module Ripcord
   class Client
@@ -19,9 +21,9 @@ module Ripcord
 
       @http_client = Net::HTTP.new(@endpoint_url.host, @endpoint_url.port)
 
-      if @endpoint_url.kind_of?(URI::HTTPS)
-        @http_client.use_ssl=true
-        #@http_client.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      if @endpoint_url.is_a?(URI::HTTPS)
+        @http_client.use_ssl = true
+        # @http_client.verify_mode = OpenSSL::SSL::VERIFY_NONE
       end
     end
 
@@ -39,19 +41,18 @@ module Ripcord
     end
 
     def inspect
-      "#<Ripcord::Client endpoint=#{@endpoint_url.to_s}>"
+      "#<Ripcord::Client endpoint=#{@endpoint_url}>"
     end
 
     private
+
     def execute_request(json_rpc_request)
       request = Net::HTTP::Post.new(@endpoint_url.request_uri)
-      request.content_type = 'application/json'
+      request.content_type = "application/json"
 
       payload_hash = json_rpc_request.to_payload
 
-      if authentication
-        authentication.apply_to(request, payload_hash)
-      end
+      authentication&.apply_to(request, payload_hash)
 
       request.body = JSON.generate(payload_hash)
 
@@ -61,20 +62,19 @@ module Ripcord
     def parse_response(http_response)
       # Check status code
       status_code = http_response.code.to_i
-      if status_code < 200 || status_code > 299
-        raise Ripcord::Error::InvalidResponse.new(http_response.body)
-      end
+      raise Ripcord::Error::InvalidResponse, http_response.body if status_code < 200 || status_code > 299
 
       # try to parse json
       begin
         json_data = JSON.parse(http_response.body, symbolize_names: true)
       rescue JSON::ParserError
-        raise Ripcord::Error::InvalidJSON.new(http_response.body)
+        raise Ripcord::Error::InvalidJSON, http_response.body
       end
 
-      if json_data.kind_of?(Hash) # Handle single response
+      case json_data
+      when Hash # Handle single response
         Ripcord::JsonRPC::Response.from_data(json_data)
-      elsif json_data.kind_of?(Array) # Handle batch response
+      when Array # Handle batch response
         json_data.map do |request_json|
           Ripcord::JsonRPC::Response.from_data(request_json)
         end

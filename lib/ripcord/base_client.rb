@@ -1,7 +1,9 @@
-require 'securerandom'
-require 'uri'
-require 'net/http'
-require 'json'
+# frozen_string_literal: true
+
+require "securerandom"
+require "uri"
+require "net/http"
+require "json"
 
 module Ripcord
   class BaseClient
@@ -17,20 +19,18 @@ module Ripcord
     end
 
     protected
+
     def execute_request(json_rpc_request)
       request = Net::HTTP::Post.new(@endpoint_url.request_uri)
-      request.content_type = 'application/json'
+      request.content_type = "application/json"
 
       payload_hash = json_rpc_request.to_payload
 
-      if authentication
-        authentication.apply_to(request, payload_hash)
-      end
+      authentication&.apply_to(request, payload_hash)
 
       request.body = JSON.generate(payload_hash)
 
       @http_client.request(request)
     end
-
   end
 end
