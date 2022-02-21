@@ -1,4 +1,4 @@
-# RiPCord [![Build Status](https://travis-ci.org/klaustopher/ripcord.svg?branch=master)](https://travis-ci.org/klaustopher/ripcord) [![Gem Version](https://badge.fury.io/rb/ripcord.svg)](https://badge.fury.io/rb/ripcord) [![Coverage Status](https://coveralls.io/repos/github/klaustopher/ripcord/badge.svg?branch=master)](https://coveralls.io/github/klaustopher/ripcord?branch=master)
+# RiPCord [![Ruby](https://github.com/klaustopher/ripcord/actions/workflows/main.yml/badge.svg)](https://github.com/klaustopher/ripcord/actions/workflows/main.yml) [![Gem Version](https://badge.fury.io/rb/ripcord.svg)](https://badge.fury.io/rb/ripcord) [![Coverage Status](https://coveralls.io/repos/github/klaustopher/ripcord/badge.svg?branch=master)](https://coveralls.io/github/klaustopher/ripcord?branch=master)
 
 This is a [JSON-RPC 2.0](http://www.jsonrpc.org/specification) implementation. It is heavily based on [JSONRPC::Client](https://github.com/fxposter/jsonrpc-client) but has a lot of changes
 from the initial implementation that are sort of specific to our use case. But it might work for you as well.
@@ -19,29 +19,26 @@ And then execute:
 
 ## Usage
 
-
 ### Basic Usage
+
 ```ruby
 client = Ripcord::Client.new('http://www.some-server.com/rpc-endpoint')
 
-client.call('add', [1,2])
+client.call('add', [1, 2])
 ```
 
 ### ... with Authentication
 
 ```ruby
-# HTTP Basic Auth (https://tools.ietf.org/html/rfc2617)
-client.authentication = Ripcord::Authentication::HTTPBasicAuth.new('user', 'password')
+client.authentication =
+    Ripcord::Authentication::HTTPBasicAuth.new('user', 'password')
 ```
 
 ```ruby
-# HTTP Token Auth (https://tools.ietf.org/html/draft-hammer-http-token-auth-01)
 client.authentication = Ripcord::Authentication::HTTPTokenAuth.new('some-token')
 ```
 
 ```ruby
-# Inline Token
-# This adds a token item to the root of the JSON request.
 client.authentication = Ripcord::Authentication::InlineToken.new('some-token')
 ```
 
