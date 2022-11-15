@@ -1,11 +1,9 @@
-# frozen_string_literal: true
+$LOAD_PATH.unshift File.expand_path('../lib', __dir__)
 
-$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
-
-require "webmock/rspec"
+require 'webmock/rspec'
 WebMock.disable_net_connect!(allow_localhost: true)
 
-require "ripcord"
+require 'ripcord'
 
 require 'simplecov'
 

@@ -1,7 +1,5 @@
-# frozen_string_literal: true
-
-require "ripcord/error"
-require "ripcord/json_rpc/error"
+require 'ripcord/error'
+require 'ripcord/json_rpc/error'
 
 module Ripcord
   module JsonRPC

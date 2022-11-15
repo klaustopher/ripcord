@@ -1,2 +1,5 @@
 inherit_gem:
   rubocop-klaustopher: rubocop.yml
+
+RSpec/SubjectStub:
+  Enabled: false

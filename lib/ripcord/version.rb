@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Ripcord
-  VERSION = "1.0.0"
+  VERSION = '1.0.0'.freeze
 end

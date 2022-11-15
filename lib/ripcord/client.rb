@@ -1,13 +1,11 @@
-# frozen_string_literal: true
+require 'ripcord/authentication'
+require 'ripcord/json_rpc'
 
-require "ripcord/authentication"
-require "ripcord/json_rpc"
-
-require "securerandom"
-require "uri"
-require "net/http"
-require "json"
-require "logger"
+require 'securerandom'
+require 'uri'
+require 'net/http'
+require 'json'
+require 'logger'
 
 module Ripcord
   class Client
@@ -48,7 +46,7 @@ module Ripcord
 
     def execute_request(json_rpc_request)
       request = Net::HTTP::Post.new(@endpoint_url.request_uri)
-      request.content_type = "application/json"
+      request.content_type = 'application/json'
 
       payload_hash = json_rpc_request.to_payload
 

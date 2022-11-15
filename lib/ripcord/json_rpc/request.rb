@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Ripcord
   module JsonRPC
     class Request
@@ -15,7 +13,7 @@ module Ripcord
       def to_payload
         {
           jsonrpc: Ripcord::JSON_RPC_VERSION,
-          method: method
+          method:  method
         }.tap do |payload_hash|
           payload_hash[:params] = params if should_include_params?
           payload_hash[:id] = id unless id.nil?

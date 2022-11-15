@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Ripcord
   module Authentication
     class HTTPTokenAuth
@@ -8,7 +6,7 @@ module Ripcord
       end
 
       def apply_to(request, _payload_hash)
-        request.add_field "Authorization", "Token token=#{@token}"
+        request.add_field 'Authorization', "Token token=#{@token}"
       end
     end
   end

@@ -1,9 +1,7 @@
-# frozen_string_literal: true
-
-require "spec_helper"
+require 'spec_helper'
 
 describe Ripcord do
-  it "has a version number" do
-    expect(Ripcord::VERSION).not_to be nil
+  it 'has a version number' do
+    expect(Ripcord::VERSION).not_to be_nil
   end
 end
