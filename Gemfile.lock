@@ -11,7 +11,7 @@ GIT
 PATH
   remote: .
   specs:
-    ripcord (1.0.0)
+    ripcord (2.0.0)
 
 GEM
   remote: https://rubygems.org/

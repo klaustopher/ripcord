@@ -1,8 +1,9 @@
 ## [Unreleased]
 
-## [1.0.1] - 2022-11-15
+## [2.0.0] - 2022-11-15
 
 - Apply Rubocop styling I am using in [all my products](https://github.com/klaustopher/rubocop-config/)
+- Remove Support for Ruby 2.x
 
 ## [1.0.0] - 2022-02-21
 
