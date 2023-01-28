@@ -6,8 +6,11 @@ describe Ripcord::JsonRPC::Response do
     described_class.new({ person_id: 47_110_815 }, nil, '1742e8634a96e9d24a1891927803127c')
   end
   let(:erroring_response) do
-    described_class.new(nil, { code: -32_700, message: 'Could not parse JSON' },
-                        '1742e8634a96e9d24a1891927803127c')
+    described_class.new(
+      nil,
+      { code: -32_700, message: 'Could not parse JSON' },
+      '1742e8634a96e9d24a1891927803127c'
+    )
   end
 
   it 'is successful when a result is present' do
@@ -75,8 +78,14 @@ describe Ripcord::JsonRPC::Response do
     end
 
     it 'returns false when data has error and result' do
-      expect(described_class).not_to be_valid_data({ jsonrpc: '2.0', id: '1',
-                                                      error: { code: 4711, message: 'some message' }, result: 50 })
+      expect(described_class).not_to be_valid_data(
+        {
+          jsonrpc: '2.0',
+          id:      '1',
+          error:   { code: 4711, message: 'some message' },
+          result:  50
+        }
+      )
     end
 
     it 'returns false when data has neither error nor result' do
@@ -88,13 +97,23 @@ describe Ripcord::JsonRPC::Response do
     end
 
     it 'returns false when the error data has no code' do
-      expect(described_class).not_to be_valid_data({ jsonrpc: '2.0', id: '1',
-                                                      error: { message: 'some message' } })
+      expect(described_class).not_to be_valid_data(
+        {
+          jsonrpc: '2.0',
+          id:      '1',
+          error:   { message: 'some message' }
+        }
+      )
     end
 
     it 'returns false when the error code is not a number' do
-      expect(described_class).not_to be_valid_data({ jsonrpc: '2.0', id: '1',
-                                                      error: { code: '4711', message: 'some message' } })
+      expect(described_class).not_to be_valid_data(
+        {
+          jsonrpc: '2.0',
+          id:      '1',
+          error:   { code: '4711', message: 'some message' }
+        }
+      )
     end
 
     it 'returns false when the error has no message' do
@@ -102,13 +121,23 @@ describe Ripcord::JsonRPC::Response do
     end
 
     it 'returns false when the error message is not a string' do
-      expect(described_class).not_to be_valid_data({ jsonrpc: '2.0', id: '1',
-                                                      error: { code: 4711, message: { foo: 123, bar: 456 } } })
+      expect(described_class).not_to be_valid_data(
+        {
+          jsonrpc: '2.0',
+          id:      '1',
+          error:   { code: 4711, message: { foo: 123, bar: 456 } }
+        }
+      )
     end
 
     it 'returns true for a valid response with error' do
-      expect(described_class).to be_valid_data({ jsonrpc: '2.0', id: '1',
-                                                      error: { code: 4711, message: 'some message' } })
+      expect(described_class).to be_valid_data(
+        {
+          jsonrpc: '2.0',
+          id:      '1',
+          error:   { code: 4711, message: 'some message' }
+        }
+      )
     end
 
     it 'returns true for a valid response with result' do

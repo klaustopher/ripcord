@@ -56,8 +56,10 @@ describe Ripcord::Client do
 
         expect(WebMock).to have_requested(:post, 'http://some-server.com/rpc-endpoint')
           .with(
-            headers: { 'Content-Type'  => 'application/json',
-                       'Authorization' => "Basic #{Base64.strict_encode64('user:password')}" },
+            headers: {
+              'Content-Type'  => 'application/json',
+              'Authorization' => "Basic #{Base64.strict_encode64('user:password')}"
+            },
             body:    '{"jsonrpc":"2.0","method":"person.create","params":{"name":"Clark Kent"},"id":"1"}'
           )
       end
@@ -82,7 +84,13 @@ describe Ripcord::Client do
         expect(WebMock).to have_requested(:post, 'http://some-server.com/rpc-endpoint')
           .with(
             headers: { 'Content-Type' => 'application/json' },
-            body:    '{"jsonrpc":"2.0","method":"person.create","params":{"name":"Clark Kent"},"id":"1","token":"some-token"}'
+            body:    {
+              jsonrpc: '2.0',
+              method:  'person.create',
+              params:  { name: 'Clark Kent' },
+              id:      '1',
+              token:   'some-token'
+            }.to_json
           )
       end
     end
@@ -121,7 +129,12 @@ describe Ripcord::Client do
 
     context 'Batch Response (Array)' do
       it 'correctly parses an array response into an array of JsonRPC::Response objects' do
-        allow(http_response).to receive(:body).and_return('[{"jsonrpc":"2.0","result":50,"id":"1"}, {"jsonrpc":"2.0","result":20,"id":"2"}]')
+        allow(http_response).to receive(:body).and_return(<<~BODY)
+          [
+            {"jsonrpc":"2.0","result":50,"id":"1"},
+            {"jsonrpc":"2.0","result":20,"id":"2"}
+          ]
+        BODY
 
         expect(Ripcord::JsonRPC::Response).to receive(:from_data).once.with({ jsonrpc: '2.0', result: 50, id: '1' })
         expect(Ripcord::JsonRPC::Response).to receive(:from_data).once.with({ jsonrpc: '2.0', result: 20, id: '2' })
